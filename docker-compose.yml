@@ -1,0 +1,25 @@
+version: "3"
+services:
+  web:
+    build: 
+      # Specify the directory that holds the image
+      context: .
+      # Define the path to the Dockerfile
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - /app/node_modules
+      - .:/app/
+
+  # We create a second container that is taking care of tests
+  test:
+    build:
+      context:
+        .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /app/node_modules/
+      - .:/app/
+    restart: "always"
+    command: ["npm", "run", "test"]
