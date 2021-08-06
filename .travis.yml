@@ -1,0 +1,11 @@
+language: generic
+sudo: required
+services:
+  - docker # Travis will automatically install docker so that it is available to us
+
+before_install:
+  - docker build -t davidkuda/docker-react -f Dockerfile.dev .
+
+script:
+# Travis CI expects return code 0. If other code is returned, Travis CI will assume that the test suite failed (broken code).
+  - docker run -e CI=true davidkuda/docker-react npm run test
