@@ -1,4 +1,4 @@
-FROM --platform=linux/arm node:alpine
+FROM node:alpine
 
 WORKDIR "/app"
 
