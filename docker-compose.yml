@@ -5,7 +5,7 @@ services:
       # Specify the directory that holds the image
       context: .
       # Define the path to the Dockerfile
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     volumes:
