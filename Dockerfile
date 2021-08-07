@@ -1,7 +1,7 @@
 # ~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
 # PHASE 1: Builder: Build the application
 
-FROM --platform=linux/arm node:alpine AS builder
+FROM node:alpine AS builder
 WORKDIR "/app"
 COPY package.json .
 RUN npm install
@@ -15,7 +15,8 @@ CMD ["npm", "run", "build"]
 
 # Using from again starts a new phase and stops /terminates
 # the previous block / phase. 
-FROM --platform=linux/arm nginx:alpine
+FROM nginx:alpine
+EXPOSE 80
 COPY --from=builder /app/build/ /usr/share/nginx/html/
 # We don't need to expliciately / specifically start
 # Nginx, since the default CMD is already set implicitaly
