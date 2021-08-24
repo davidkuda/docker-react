@@ -1,0 +1,27 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t davidkuda/react-test -f ./frontend/Dockerfile.dev ./client/.
+
+script:
+  - docker run -e CI=true davidkuda/react-test npm test
+
+after_success:
+  # Create images
+  - docker build -t davidkuda/cd_frontend ./frontend/.
+  - docker build -t davidkuda/cd_backend ./backend/.
+  - docker build -t davidkuda/cd_nginx ./nginx/.
+  - docker build -t davidkuda/cd_worker ./worker/.
+
+  # Log in to the docker CLI
+  # Secrets are taken from Travis CI Env Vars
+  - echo "$DOCKER_PASSWORD" | docker login --user "$DOCKER_ID" --password-stdin
+
+  # Push the images to docker hub
+  - docker push davidkuda/cd_frontend
+  - docker push davidkuda/cd_backend
+  - docker push davidkuda/cd_nginx
+  - docker push davidkuda/cd_worker
+
