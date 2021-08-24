@@ -1,25 +1,61 @@
 version: "3"
-services:
-  web:
-    build: 
-      # Specify the directory that holds the image
-      context: .
-      # Define the path to the Dockerfile
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    volumes:
-      - /app/node_modules
-      - .:/app/
 
-  # We create a second container that is taking care of tests
-  test:
+services:
+
+  nginx:
+    depends_on:
+      - backend
+      - frontend
+    restart: always # restart policy: Restart on error, crash or whatever
     build:
-      context:
-        .
       dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - 3050:80
+
+  backend:
+    image: complex/backend
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./backend/ # Which folder to look for the Dockerfile
+    volumes:
+      - /app/node_modules/ # Ignore node_modules
+      - ./backend/:/app/
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres # name of the service
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+
+  frontend:
+    image: complex/frontend
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./frontend/
+    stdin_open: True
     volumes:
       - /app/node_modules/
-      - .:/app/
-    restart: "always"
-    command: ["npm", "run", "test"]
+      - ./frontend/:/app/
+
+  worker:
+    image: complex/worker
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./worker/
+    volumes:
+      - /app/node_modules
+      - ./worker:/app/
+    environment: 
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+  postgres:
+    image: postgres
+    environment: 
+      - POSTGRES_PASSWORD=postgres_password
+
+  redis:
+    image: redis
