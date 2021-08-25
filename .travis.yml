@@ -17,7 +17,7 @@ after_success:
 
   # Log in to the docker CLI
   # Secrets are taken from Travis CI Env Vars
-  - echo "$DOCKER_PASSWORD" | docker login --user "$DOCKER_ID" --password-stdin
+  - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_ID" --password-stdin
 
   # Push the images to docker hub
   - docker push davidkuda/cd_frontend
